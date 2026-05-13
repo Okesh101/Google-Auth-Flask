@@ -103,6 +103,7 @@ curl http://127.0.0.1:5000/api/v1/health
 
 
 ***b. React***
+
 To visualize the effect of the endpoints
 - Go to any browser and enter `http://127.0.0.1:5173` as the url
 - View the landing page
