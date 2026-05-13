@@ -26,6 +26,7 @@ def auth_callback():
 
         if exists:
             session["user"] = {
+                "id": exists['id'],
                 "email": exists['email'],
                 "name": exists['name'],
                 "picture": exists['profile_pic']
@@ -44,6 +45,7 @@ def auth_callback():
                 }
 
         return redirect("http://127.0.0.1:5173/dashboard")
+    
     except Exception as e:
         return jsonify({"status": "ERROR", 
                         "message": str(e), 

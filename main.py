@@ -9,6 +9,7 @@ load_dotenv()
 FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY")
 FLASK_ENV = os.getenv("FLASK_ENV")
 
+
 def initialize_app():
     app = Flask(__name__)
     CORS(app, supports_credentials=True)
@@ -19,7 +20,9 @@ def initialize_app():
 
 def create_app(app):
     from routes.auth import auth_bp
+    from routes.health import health_bp
     app.register_blueprint(auth_bp)
+    app.register_blueprint(health_bp)
 
     return app
 

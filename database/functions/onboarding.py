@@ -11,7 +11,7 @@ def sign_up_user(name, email, profile_pic=""):
         cursor.execute(
             """INSERT INTO users (id, email, name, profile_pic)
             VALUES (?, ?, ?, ?)
-            """, (user_id, name, email, profile_pic,)
+            """, (user_id, email, name, profile_pic,)
         )
 
         db.commit()

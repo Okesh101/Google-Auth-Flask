@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function Dashboard() {
+const Dashboard = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -32,8 +32,8 @@ function Dashboard() {
       const data = await res.json();
 
       if (data.status === "SUCCESS") {
-        setUser(null);
         window.location.href = "/";
+        setUser(null);
       } else {
         console.error("Failed to logout:", data.message);
       }
