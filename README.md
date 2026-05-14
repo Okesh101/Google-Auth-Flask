@@ -10,6 +10,7 @@ This API uses Google Secure OAuth2.0 Authentication to sign in users into your w
 
 ### Build Instructions
 
+
 1. Setting up the environment
 
 ***a. Python Environment***
@@ -23,6 +24,7 @@ This API uses Google Secure OAuth2.0 Authentication to sign in users into your w
 - Inside frontend directory, run `npm install`. Ensure you have `node` and `npm` installed already on your system.
 - Wait till all packages are fully installed.
 
+
 2. Configuring the environment
 
 ***a. Python Configuration***
@@ -30,6 +32,7 @@ This API uses Google Secure OAuth2.0 Authentication to sign in users into your w
 - Get your secure credentials from Google Cloud Console and replace them in the new `.env` file.
 - Replace only (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
 - Generate any secure key (string) and save it as your (FLASK_SECRET_KEY) for sessions
+
 
 3. Run the development servers
 
@@ -70,6 +73,8 @@ Press CTRL+C to quit
 ### Test Instructions
 
 **NOTE: Ensure you're connected to the internet**
+
+
 1. Testing the API endpoints
 
 ***a. Python***
@@ -111,6 +116,9 @@ To visualize the effect of the endpoints
 
 ### Authors
 ***Name: Okesh***
+
 ***Version: 1.0.0***
+
 ***Portfolio: Backend Developer***
+
 ***Link: [Portfolio](https://okesh101.github.io/My-Portfolio)***
