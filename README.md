@@ -117,7 +117,7 @@ To visualize the effect of the endpoints
 ### Authors
 *Name: Okesh*
 
-*Version: 1.0.0*
+*Version: 1.0.1*
 
 *Portfolio: Backend Developer*
 
