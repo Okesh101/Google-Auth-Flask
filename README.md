@@ -1,9 +1,7 @@
 # Basic OAuth2.0 API
 Built using Google Auth, Flask & React Typescript
 
-
 This API uses Google Secure OAuth2.0 Authentication to sign in users into your website.
-
 
 **Features**
 - Landing Page with "Sign In With Google" button
@@ -32,7 +30,6 @@ This API uses Google Secure OAuth2.0 Authentication to sign in users into your w
 - Get your secure credentials from Google Cloud Console and replace them in the new `.env` file.
 - Replace only (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
 - Generate any secure key (string) and save it as your (FLASK_SECRET_KEY) for sessions
-
 
 3. Run the development servers
 
@@ -101,7 +98,6 @@ curl http://127.0.0.1:5000/api/v1/health
 
 - Replace the `/api/v1/health` with other endpoints
 
-
 ***b. React***
 
 To visualize the effect of the endpoints
@@ -113,15 +109,8 @@ To visualize the effect of the endpoints
 - View your details as fetched from google
 - Click on "Sign Out" to log out from the site
 
-
 ### Authors
 ***Name: Okesh***
-
-
 ***Version: 1.0.0***
-
-
 ***Portfolio: Backend Developer***
-
-
 ***Link: [Portfolio](https://okesh101.github.io/My-Portfolio)***
