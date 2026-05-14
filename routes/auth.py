@@ -2,9 +2,13 @@ from flask import Blueprint, redirect, request, jsonify, session, url_for
 from services.googleService import google_setup
 from database.functions.onboarding import get_user_by_email, sign_up_user
 from database.functions.profile import get_me
+from datetime import datetime, timedelta, UTC
+import jwt, os
 
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/api/v1/auth')
+FRONTEND_URL = os.getenv("FRONTEND_URL")
+JWT_SECRET = os.getenv("JWT_SECRET_KEY")
 google = google_setup()
 
 
@@ -24,20 +28,46 @@ def auth_callback():
         user_info = token.get("userinfo")
 
         exists = get_user_by_email(user_info.get("email"))
-        session.permanent = True
 
-        if exists: # Signing in existing user
-            session["user"] = exists['id']
-        else: # Signing up new user
+        # Signing in existing user
+        if exists: 
+            payload = { # Generating the payload to be sent alongside the JWT token
+                "user_id": exists['id'],
+                "email": exists['email'],
+                "exp": datetime.now(UTC) + timedelta(hours=1)
+            }
+            token = jwt.encode( # Generating JWT token for the user
+                payload,
+                JWT_SECRET,
+                algorithm="HS256"
+            )
+
+            return redirect(f"{FRONTEND_URL}?token={token}")
+        
+        # Signing up new user
+        else: 
             created_user = sign_up_user( # Saving user in my database
                 user_info.get("name"), 
                 user_info.get("email"), 
                 user_info.get("picture")
             )
             if created_user['code'] == 201: # Successfully created user in database
-                session["user"] = created_user['data']['id']
+                user_data = created_user['data']
+                payload = { # Generating the payload to be sent alongside the JWT token
+                    "user_id": user_data['id'],
+                    "email": user_data['email'],
+                    "exp": datetime.now(UTC) + timedelta(hours=1)
+                }
+                token = jwt.encode( # Generating JWT token for the user
+                    payload,
+                    JWT_SECRET,
+                    algorithm="HS256"
+                )
 
-        return redirect("http://127.0.0.1:5173/dashboard")
+                return redirect(f"{FRONTEND_URL}?token={token}")
+
+            else:
+                return redirect(f"{FRONTEND_URL}")
     
     except Exception as e:
         return jsonify({"status": "ERROR", 
@@ -48,11 +78,21 @@ def auth_callback():
 @auth_bp.route('/me', methods=['GET'])
 def me_endpoint():
     try:
-        user_id = session.get("user")
-        if not user_id:
+        auth_header = request.headers.get("Authorization")
+
+        if not auth_header:
             return jsonify({"status": "ERROR", 
-                            "message": "User not authorized", 
+                            "message": "No token provided", 
                             "code": 401}), 401
+        
+        token = auth_header.split(" ")[1]
+        decoded = jwt.decode(
+            token,
+            JWT_SECRET,
+            algorithms=["HS256"]
+        )
+        
+        user_id = decoded["user_id"]
         
         user_data = get_me(user_id)
 
