@@ -115,10 +115,10 @@ To visualize the effect of the endpoints
 - Click on "Sign Out" to log out from the site
 
 ### Authors
-***Name: Okesh***
+*Name: Okesh*
 
-***Version: 1.0.0***
+*Version: 1.0.0*
 
-***Portfolio: Backend Developer***
+*Portfolio: Backend Developer*
 
-***Link: [Portfolio](https://okesh101.github.io/My-Portfolio)***
+*Link: [Portfolio](https://okesh101.github.io/My-Portfolio)*
