@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, request, jsonify, session, url_for
 from services.googleService import google_setup
 from database.functions.onboarding import get_user_by_email, sign_up_user
+from database.functions.profile import get_me
 
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/api/v1/auth')
@@ -23,26 +24,18 @@ def auth_callback():
         user_info = token.get("userinfo")
 
         exists = get_user_by_email(user_info.get("email"))
+        session.permanent = True
 
-        if exists:
-            session["user"] = {
-                "id": exists['id'],
-                "email": exists['email'],
-                "name": exists['name'],
-                "picture": exists['profile_pic']
-            }
-        else:
-            result = sign_up_user(
+        if exists: # Signing in existing user
+            session["user"] = exists['id']
+        else: # Signing up new user
+            created_user = sign_up_user( # Saving user in my database
                 user_info.get("name"), 
                 user_info.get("email"), 
                 user_info.get("picture")
             )
-            if result['code'] == 201:
-                session["user"] = {
-                    "email": user_info.get("email"),
-                    "name": user_info.get("name"),
-                    "picture": user_info.get("picture")
-                }
+            if created_user['code'] == 201: # Successfully created user in database
+                session["user"] = created_user['data']['id']
 
         return redirect("http://127.0.0.1:5173/dashboard")
     
@@ -55,16 +48,15 @@ def auth_callback():
 @auth_bp.route('/me', methods=['GET'])
 def me_endpoint():
     try:
-        user = session.get("user")
-        if not user:
+        user_id = session.get("user")
+        if not user_id:
             return jsonify({"status": "ERROR", 
                             "message": "User not authorized", 
                             "code": 401}), 401
+        
+        user_data = get_me(user_id)
 
-        return jsonify({"status": "SUCCESS", 
-                        "data": user, 
-                        "code": 200, 
-                        "message": "User details fetched successfully"}), 200
+        return jsonify(user_data), user_data['code']
     
     except Exception as e:
         return jsonify({"status": "ERROR", 
