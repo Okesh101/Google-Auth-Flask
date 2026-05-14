@@ -57,8 +57,8 @@ const Dashboard = () => {
         <div>
           <h1>Dashboard</h1>
           <p>
-            Welcome {user && user?.new === true ? "Back" : "New User"},{" "}
-            {user ? user.name.split(" ")[0] : "User"}! <br />
+            Welcome {user ? `Back ${user.name.split(" ")[0]}` : "New User"}
+            ! <br />
             This is your dashboard where you can view your profile information
             and manage your account settings.
           </p>
@@ -80,6 +80,6 @@ const Dashboard = () => {
       </section>
     </>
   );
-}
+};
 
 export default Dashboard;
