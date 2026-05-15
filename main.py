@@ -22,9 +22,11 @@ def create_app(app):
     from routes.auth import auth_bp
     from routes.health import health_bp
     from routes.admin import admin_bp
+    from routes.google import google_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(health_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(google_bp)
 
     return app
 
