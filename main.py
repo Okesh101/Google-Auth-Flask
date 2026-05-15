@@ -21,8 +21,10 @@ def initialize_app():
 def create_app(app):
     from routes.auth import auth_bp
     from routes.health import health_bp
+    from routes.admin import admin_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(health_bp)
+    app.register_blueprint(admin_bp)
 
     return app
 

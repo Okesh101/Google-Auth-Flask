@@ -2,6 +2,7 @@ from flask import Blueprint, redirect, request, jsonify, session, url_for, g
 from services.googleService import google_setup
 from middlewares.auth_middleware import require_auth
 from database.functions.onboarding import get_user_by_email, sign_up_user
+from urllib.parse import quote
 from database.functions.profile import get_me
 from datetime import datetime, timedelta, UTC
 import jwt
@@ -40,6 +41,7 @@ def auth_callback():
             access_payload = {  # Generating the payload to be sent alongside the JWT token (access_token)
                 "user_id": exists['id'],
                 "email": exists['email'],
+                "role": exists['role'],
                 "exp": datetime.now(UTC) + timedelta(minutes=15),
                 "type": "access"
             }
@@ -47,6 +49,7 @@ def auth_callback():
             refresh_payload = {  # Generating the payload to be sent alongside the JWT token (refresh_token)
                 "user_id": exists["id"],
                 "email": exists['email'],
+                "role": exists['role'],
                 "exp": datetime.now(UTC) + timedelta(days=30),
                 "type": "refresh"
             }
@@ -63,8 +66,9 @@ def auth_callback():
                 algorithm="HS256"
             )
 
+            encoded_access_token = quote(access_token)
             response = redirect(
-                f"{FRONTEND_URL}/auth/callback?access_token={access_token}"
+                f"{FRONTEND_URL}/auth/callback?access_token={encoded_access_token}"
             )
 
             response.set_cookie(
@@ -91,6 +95,7 @@ def auth_callback():
                 access_payload = {  # Generating the payload to be sent alongside the JWT token (access_token)
                     "user_id": user_data['id'],
                     "email": user_data['email'],
+                    "role": user_data['role'],
                     "exp": datetime.now(UTC) + timedelta(minutes=15),
                     "type": "access"
                 }
@@ -98,6 +103,7 @@ def auth_callback():
                 refresh_payload = {  # Generating the payload to be sent alongside the JWT token (refresh_token)
                     "user_id": user_data["id"],
                     "email": user_data['email'],
+                    "role": user_data['role'],
                     "exp": datetime.now(UTC) + timedelta(days=30),
                     "type": "refresh"
                 }
@@ -113,9 +119,10 @@ def auth_callback():
                     JWT_SECRET,
                     algorithm="HS256"
                 )
-
+                
+                encoded_access_token = quote(access_token)
                 response = redirect(
-                    f"{FRONTEND_URL}/auth/callback?access_token={access_token}"
+                    f"{FRONTEND_URL}/auth/callback?access_token={encoded_access_token}"
                 )
 
                 response.set_cookie(
@@ -140,13 +147,34 @@ def auth_callback():
 
 @auth_bp.route('/refresh', methods=['POST'])
 def refresh_token_endpoint():
-    refresh_token = request.cookie.get("refresh_token")
+    refresh_token = request.cookies.get("refresh_token")
 
-    decoded = jwt.decode(
-        refresh_token,
-        JWT_SECRET,
-        algorithms=['HS256']
-    )
+    if not refresh_token:
+        return jsonify({
+            "status": "ERROR",
+            "code": 401,
+            "message": "Refresh token missing"
+        }), 401
+
+    try:
+        decoded = jwt.decode(
+            refresh_token,
+            JWT_SECRET,
+            algorithms=['HS256']
+        )
+    except jwt.ExpiredSignatureError:
+        return jsonify({
+            "status": "ERROR",
+            "message": "Token expired",
+            "code": 401
+        }), 401
+
+    except jwt.InvalidTokenError:
+        return jsonify({
+            "status": "ERROR",
+            "message": "Invalid token",
+            "code": 401
+        }), 401
 
     if decoded["type"] != "refresh":
         return jsonify({
@@ -157,6 +185,8 @@ def refresh_token_endpoint():
     
     new_access_payload = {
         "user_id": decoded["user_id"],
+        "email": decoded["email"],
+        "role": decoded["role"],
         "exp": datetime.now(UTC) + timedelta(minutes=15),
         "type": "access"
     }

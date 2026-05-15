@@ -3,15 +3,15 @@ import sqlite3
 import uuid
 
 
-def sign_up_user(name, email, profile_pic=""):
+def sign_up_user(name, email, profile_pic="", role="user"):
     db = get_db_connection()
     try:
         cursor = db.cursor()
         user_id = str(uuid.uuid4())
         cursor.execute(
-            """INSERT INTO users (id, email, name, profile_pic)
-            VALUES (?, ?, ?, ?)
-            """, (user_id, email, name, profile_pic,)
+            """INSERT INTO users (id, email, name, profile_pic, role)
+            VALUES (?, ?, ?, ?, ?)
+            """, (user_id, email, name, profile_pic, role)
         )
 
         db.commit()
@@ -23,6 +23,7 @@ def sign_up_user(name, email, profile_pic=""):
                 "id": user_id,
                 "name": name,
                 "email": email,
+                "role": role,
                 "picture": profile_pic
             }
         }
