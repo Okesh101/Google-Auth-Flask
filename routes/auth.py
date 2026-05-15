@@ -1,5 +1,6 @@
-from flask import Blueprint, redirect, request, jsonify, session, url_for
+from flask import Blueprint, redirect, request, jsonify, session, url_for, g
 from services.googleService import google_setup
+from middlewares.auth_middleware import require_auth
 from database.functions.onboarding import get_user_by_email, sign_up_user
 from database.functions.profile import get_me
 from datetime import datetime, timedelta, UTC
@@ -7,6 +8,8 @@ import jwt, os
 
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/api/v1/auth')
+
+
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 JWT_SECRET = os.getenv("JWT_SECRET_KEY")
 google = google_setup()
@@ -76,23 +79,10 @@ def auth_callback():
 
 
 @auth_bp.route('/me', methods=['GET'])
+@require_auth
 def me_endpoint():
     try:
-        auth_header = request.headers.get("Authorization")
-
-        if not auth_header:
-            return jsonify({"status": "ERROR", 
-                            "message": "No token provided", 
-                            "code": 401}), 401
-        
-        token = auth_header.split(" ")[1]
-        decoded = jwt.decode(
-            token,
-            JWT_SECRET,
-            algorithms=["HS256"]
-        )
-        
-        user_id = decoded["user_id"]
+        user_id = g.user["user_id"]
         
         user_data = get_me(user_id)
 
