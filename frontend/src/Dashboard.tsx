@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import apiFetch from "./api/client";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -6,13 +7,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://127.0.0.1:5000/api/v1/auth/me", {
-          credentials: "include",
-          headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await apiFetch("/api/auth/me");
         const data = await res.json();
 
         if (data.status === "SUCCESS") {
@@ -29,10 +24,13 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:5000/api/v1/auth/logout", {
+      const options = {
         method: "GET",
-        credentials: "include",
-      });
+        headers: {
+          "Content-Type": "application/json"
+        }
+      };
+      const res = await apiFetch("/api/v1/auth/logout", options);
       const data = await res.json();
 
       if (data.status === "SUCCESS") {
