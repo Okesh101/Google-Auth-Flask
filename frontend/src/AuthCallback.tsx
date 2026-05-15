@@ -6,16 +6,17 @@ const AuthCallback = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-
+    
     const access_token = params.get("access_token");
+    
+    console.log(window.location.search);
+    console.log(access_token)
 
-    if (access_token) {
-      localStorage.setItem("access_token", access_token);
+    if (!access_token) return;
 
-      navigate("/dashboard");
-    } else {
-      navigate("/");
-    }
+    localStorage.setItem("access_token", access_token);
+
+    navigate("/dashboard");
   }, []);
 
   return <p>Logging you in...</p>;

@@ -15,5 +15,5 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
-  </StrictMode>,
+  </StrictMode>
 );
