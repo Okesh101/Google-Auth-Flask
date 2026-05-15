@@ -35,6 +35,7 @@ const Dashboard = () => {
 
       if (data.status === "SUCCESS") {
         window.location.href = "/";
+        localStorage.removeItem("access_token");
         setUser(null);
       } else {
         console.error("Failed to logout:", data.message);
