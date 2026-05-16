@@ -1,3 +1,5 @@
+# middlewares/auth_middleware.py
+
 from functools import wraps
 from flask import request, jsonify, g
 import jwt

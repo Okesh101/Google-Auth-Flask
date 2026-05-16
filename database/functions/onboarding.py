@@ -1,3 +1,5 @@
+# database/functions/onboarding.py
+
 from database.db import get_db_connection
 import sqlite3
 import uuid

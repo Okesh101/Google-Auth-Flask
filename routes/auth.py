@@ -1,5 +1,8 @@
+# routes/auth.py
+
 from flask import Blueprint, request, jsonify, g
 from middlewares.auth_middleware import require_auth
+from database.functions.jwt_auth import verify_refresh_token, revoke_refresh_token
 from database.functions.profile import get_me
 from datetime import datetime, timedelta, UTC
 import jwt
@@ -29,6 +32,18 @@ def refresh_token_endpoint():
             JWT_SECRET,
             algorithms=['HS256']
         )
+
+        if decoded["type"] != "refresh":
+            return jsonify({
+                "status": "ERROR",
+                "code": 401,
+                "message": "Invalid token type"
+            }), 401
+        
+        db_token = verify_refresh_token(refresh_token)
+        if db_token['code'] != 200:
+            return jsonify(db_token), db_token['code']
+        
     except jwt.ExpiredSignatureError:
         return jsonify({
             "status": "ERROR",
@@ -43,12 +58,6 @@ def refresh_token_endpoint():
             "code": 401
         }), 401
 
-    if decoded["type"] != "refresh":
-        return jsonify({
-            "status": "ERROR",
-            "code": 401,
-            "message": "Invalid token type"
-        }), 401
     
     new_access_payload = {
         "user_id": decoded["user_id"],
@@ -89,7 +98,21 @@ def me_endpoint():
 
 
 @auth_bp.route('/logout', methods=['POST'])
+@require_auth
 def logout_endpoint():
+    refresh_token = request.cookies.get("refresh_token")
+
+    if not refresh_token:
+        return jsonify({
+            "status": "ERROR",
+            "code": 401,
+            "message": "Refresh token missing"
+        }), 401
+    
+    revoke_token_result = revoke_refresh_token(refresh_token)
+    if revoke_token_result['code'] != 200:
+        return jsonify(revoke_token_result), revoke_token_result['code']
+
     response = jsonify({
         "status": "SUCCESS",
         "code": 200,

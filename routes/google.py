@@ -1,6 +1,9 @@
+# routes/google.py
+
 from flask import Blueprint, redirect, jsonify, url_for
 from services.googleService import google_setup
 from database.functions.onboarding import get_user_by_email, sign_up_user
+from database.functions.jwt_auth import save_refresh_token
 from urllib.parse import quote
 from datetime import datetime, timedelta, UTC
 import os
@@ -62,6 +65,12 @@ def auth_callback():
                 algorithm="HS256"
             )
 
+            refresh_token_result = save_refresh_token(
+                exists["id"], refresh_token, datetime.now(UTC) + timedelta(days=30))
+            
+            if refresh_token_result['code'] != 200:
+                return jsonify(refresh_token_result), refresh_token_result['code']
+
             encoded_access_token = quote(access_token)
             response = redirect(
                 f"{FRONTEND_URL}/auth/callback?access_token={encoded_access_token}"
@@ -72,7 +81,7 @@ def auth_callback():
                 refresh_token,
                 httponly=True,
                 secure=True if is_production else False,
-                samesite="Lax",
+                samesite="None" if is_production else "Lax",
                 max_age=60 * 60 * 24 * 30
             )
 
@@ -115,6 +124,12 @@ def auth_callback():
                     JWT_SECRET,
                     algorithm="HS256"
                 )
+
+                refresh_token_result = save_refresh_token(
+                    user_data["id"], refresh_token, datetime.now(UTC) + timedelta(days=30))
+
+                if refresh_token_result['code'] != 200:
+                    return jsonify(refresh_token_result), refresh_token_result['code']
 
                 encoded_access_token = quote(access_token)
                 response = redirect(

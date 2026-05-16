@@ -1,3 +1,5 @@
+# main.py
+
 from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -9,11 +11,12 @@ load_dotenv()
 
 FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY")
 FLASK_ENV = os.getenv("FLASK_ENV")
+FRONTEND_URL = os.getenv("FRONTEND_URL")
 
 
 def initialize_app():
     app = Flask(__name__)
-    CORS(app, supports_credentials=True)
+    CORS(app, supports_credentials=True, origins=[FRONTEND_URL])
     app.config["SECRET_KEY"] = FLASK_SECRET_KEY
     return app
 
