@@ -7,7 +7,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await apiFetch("/api/auth/me");
+        const res = await apiFetch("/api/v1/auth/me");
         const data = await res.json();
 
         if (data.status === "SUCCESS") {
